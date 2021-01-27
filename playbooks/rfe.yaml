@@ -1,0 +1,5 @@
+- hosts: localhost
+  tasks:
+    - name: Execute RFE Role
+      import_role:
+        name: manage_containers

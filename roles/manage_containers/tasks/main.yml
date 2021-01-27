@@ -1,0 +1,28 @@
+---
+# tasks file for manage_containers
+
+- name: Open firewalld Ports
+  firewalld:
+    port: "{{ item }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  loop: "{{ ports }}"
+
+- name: Create Systemd Unit Files
+  template:
+    src: container-systemd.service.j2
+    dest: "/etc/systemd/system/{{ container.name }}.service"
+    mode: 0644
+  loop: "{{ containers }}"
+  loop_control:
+    loop_var: container
+  notify:
+    - reload systemd
+
+- name: Enable and Start Containers
+  systemd:
+    enabled: yes
+    name: "{{ item.name }}"
+    state: started
+  loop: "{{ containers }}"

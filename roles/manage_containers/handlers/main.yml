@@ -1,0 +1,6 @@
+---
+# handlers file for manage_containers
+
+- name: reload systemd
+  systemd:
+    daemon_reload: yes

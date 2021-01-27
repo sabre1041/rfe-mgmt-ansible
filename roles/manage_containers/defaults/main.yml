@@ -1,0 +1,9 @@
+---
+# defaults file for manage_containers
+
+containers:
+  - name: httpd
+    args: -p 8080:8080 registry.access.redhat.com/rhscl/httpd-24-rhel7:latest
+
+ports:
+  - "8080/tcp"
