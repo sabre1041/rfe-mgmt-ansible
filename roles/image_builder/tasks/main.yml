@@ -1,0 +1,66 @@
+---
+# tasks file for image_builder
+
+- name: Subscribe machines
+  include_role:
+    name: "{{ role_path }}/../infra-ansible/roles/rhsm"
+  when: rhsm_manage | bool
+
+- name: Install Packages
+  package:
+    name: "{{ yum_packages }}"
+    state: present
+
+- name: cockpit service socket
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop: "{{ systemd_services }}"
+
+- name: firewalld
+  firewalld:
+    service: cockpit
+    state: enabled
+    permanent: yes
+    immediate: yes
+
+- name: firewalld
+  firewalld:
+    port: "{{ httpd_host_port }}/tcp"
+    state: enabled
+    permanent: yes
+    immediate: yes
+
+- name: Slurp composer repository file
+  slurp:
+    src: /usr/share/osbuild-composer/repositories/rhel-8.json
+  register: composer_repository
+
+- name: Create Composer Repository Directory
+  file:
+    state: directory
+    dest: /etc/osbuild-composer/repositories
+
+- name: Set Composer Repository Fact
+  set_fact:
+    composer_repositories: "{{ composer_repository['content'] | b64decode | from_json }}"
+
+- name: Update with Ansible Facts
+  set_fact:
+    composer_repositories: "{{ composer_repositories | combine({item.key: item.value + [ { 'name': 'ansible-2.9', 'baseurl': 'https://cdn.redhat.com/content/dist/layered/rhel8/' + item.key + '/ansible/2.9/os', 'gpgkey': item.value[0]['gpgkey'], 'rhsm': true, 'check_gpg': true }]}) }}"
+  loop: "{{ composer_repository['content'] | b64decode | from_json | dict2items }}"
+
+- name: Write Composer repository file
+  copy:
+    content: "{{ composer_repositories | to_nice_json }}"
+    mode: 0644
+    dest: /etc/osbuild-composer/repositories/rhel-8.json
+  notify:
+    - restart osbuild-composer.socket
+
+- name: Build Image
+  include_tasks: build_image.yaml
+  loop: "{{ image_builder_images }}"
+  loop_control:
+    loop_var: builder_image

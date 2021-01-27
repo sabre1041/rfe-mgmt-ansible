@@ -1,0 +1,7 @@
+---
+# handlers file for image_builder
+
+- name: restart osbuild-composer.socket
+  systemd:
+    state: restarted
+    name: osbuild-composer.socket

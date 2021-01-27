@@ -1,0 +1,10 @@
+name = "{{ builder_image.name }}"
+description = "{{ builder_image.description | default('')}}"
+version = "{{  builder_image.version | default('0.0.1')}}"
+
+{% for module in builder_image.modules %}
+[[modules]]
+name = "{{module.name}}"
+version = "{{ module.version | default('*') }}"
+
+{% endfor %}
