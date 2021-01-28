@@ -1,6 +1,9 @@
 # rfe-ansible-edge-mgmt
 
 Ansible automation to provision an RHEL for Edge Environments.
+
+![Architecture](docs/images/architecture_overview.png)
+
 ## Prerequisites
 ### Download dependencies
 
