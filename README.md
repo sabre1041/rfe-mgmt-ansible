@@ -7,7 +7,7 @@ Ansible automation to provision an RHEL for Edge Environments.
 Execute the following commands to download the required dependencies
 
 ```
-$ ansible-galaxy role install -r collections/requirements.yml
+$ ansible-galaxy role install -r collections/requirements.yaml
 ```
 
 ### Populate Inventory
