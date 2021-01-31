@@ -63,7 +63,9 @@ cat > /etc/systemd/system/rfe-automation.service << 'EOF'
 [Unit]
 Description=RFE Automation
 Requires=network.target
+Requires=network-online.target
 After=network-online.target
+After=nss-lookup.target
  
 [Service]
 Type=oneshot
