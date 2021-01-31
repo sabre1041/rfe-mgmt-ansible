@@ -37,6 +37,14 @@ ostreesetup --nogpg --url=http://{{ ansible_default_ipv4.address }}:{{ httpd_hos
 echo AutomaticUpdatePolicy=stage >> /etc/rpm-ostreed.conf
 
 
+# Create SSH Key for Ansible 
+
+mkdir /root/.ssh
+chmod 700 /root/.ssh
+
+ssh-keygen -f /root/.ssh/ansible -t rsa -N ''
+cat /root/.ssh/ansible.pub >> /root/.ssh/authorized_keys
+
 # Set up automation script
 
 mkdir /var/rfe
@@ -44,15 +52,37 @@ mkdir /var/rfe
 cat > /var/rfe/setup.sh << 'EOF'
 #!/bin/bash
 
+set -e
+
 GIT_REPO="{{ rfe_git.url }}"
 GIT_VERSION="{{ rfe_git.version }}"
 REPO_DIR="/var/rfe/repo"
 PLAYBOOK_FILE="{{ rfe_git.playbook_file }}"
+RUNNER_IMAGE="{{ ansible_runner.image }}"
+RUNNER_IMAGE_PRIVATE_KEY_MOUNT="{{ ansible_runner.private_key_mount }}"
 
-ansible -c local localhost -m git -a "repo=${GIT_REPO} dest=${REPO_DIR} version=${GIT_VERSION}" > /dev/null
+if [ ! -d "${REPO_DIR}" ]; then
+  git clone "${GIT_REPO}" "${REPO_DIR}"
+fi
+
+cd "${REPO_DIR}"
+
+git remote set-url origin "${GIT_REPO}"
+
+git fetch origin
+
+local_branch=$(git branch --list ${GIT_VERSION})
+
+if [ -z "${local_branch}" ]; then
+  git checkout -b ${GIT_VERSION}  origin/${GIT_VERSION}
+else
+  git checkout ${GIT_VERSION}
+fi
+
+git reset --hard origin/${GIT_VERSION}
 
 if [ -f "${REPO_DIR}/${PLAYBOOK_FILE}" ]; then
-  ansible-playbook -c local "${REPO_DIR}/${PLAYBOOK_FILE}"
+  podman run -it --rm -v /root/.ssh/ansible:${RUNNER_IMAGE_PRIVATE_KEY_MOUNT}:Z -v ${REPO_DIR}:${REPO_DIR}:Z -w ${REPO_DIR} --net host ${RUNNER_IMAGE} ansible-playbook -i localhost, --private-key=${RUNNER_IMAGE_PRIVATE_KEY_MOUNT} "${REPO_DIR}/${PLAYBOOK_FILE}"
 fi
 
 EOF
@@ -64,6 +94,7 @@ cat > /etc/systemd/system/rfe-automation.service << 'EOF'
 Description=RFE Automation
 Requires=network.target
 After=network-online.target
+After=nss-lookup.target
  
 [Service]
 Type=oneshot

@@ -8,7 +8,6 @@ container_image_directory_path: /tmp/container_build
 rhsm_repos:
   - rhel-8-for-x86_64-baseos-rpms
   - rhel-8-for-x86_64-appstream-rpms
-  - ansible-2.9-for-rhel-8-x86_64-rpms
 
 yum_packages:
   - firewalld
@@ -28,8 +27,6 @@ image_builder_images:
     description: RFE Ansible
     version: 0.0.1
     modules:
-      - name: ansible
-        version: "*"
       - name: git
         version: "*"
 
@@ -45,3 +42,7 @@ rfe_automation_timer_sync: 60min
 
 httpd_container_port: 80
 httpd_host_port: 8000
+
+ansible_runner:
+  image: docker.io/ansible/ansible-runner:1
+  private_key_mount: /runner/.ssh/id_rsa

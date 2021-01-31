@@ -29,7 +29,7 @@ rhsm_username: "<password>"
 rhsm_password: "<username>"
 ```
 
-You can choose to skip Ansible from managing subscription information by passing `-e rhsm_manage=false`. Be sure that the machine is subscribed to `ansible-2.9-for-rhel-8-x86_64-rpms` along with the default RHEL8 repositories.
+**Note:** If your machine is already subscribed, you can skip registration by passing `-e rhsm_manage=false`.
 
 ## Provision
 

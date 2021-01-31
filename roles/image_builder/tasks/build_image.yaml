@@ -48,7 +48,6 @@
   set_fact:
     container_image_directory: "{{ container_image_directory_path }}/{{ build_id }}"
 
-  #when: "{{ image_builder_status.stdout | from_json | selectattr('blueprint', 'equalto', builder_image.name) | selectattr('version', 'equalto', builder_image.version) | list }}"
 - name: Make Directory for Container Image Build
   file:
     state: directory
