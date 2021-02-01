@@ -1,6 +1,9 @@
 # rfe-ansible-edge-mgmt
 
-Ansible automation to provision an RHEL for Edge Environments.
+Ansible automation to provision an RHEL for Edge Environments
+## Solution Overview
+
+This approach focuses on the Ansible automation being driven through the execution directly on the edge node. Ansible RPM's are installed into the RFE image and executed as the node boots.
 
 ![Architecture](docs/images/architecture_overview.png)
 
