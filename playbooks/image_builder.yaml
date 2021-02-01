@@ -1,7 +1,0 @@
----
-- hosts: image_builder
-  become: yes
-  tasks:
-    - name: Image Builder Role
-      import_role:
-        name: image_builder

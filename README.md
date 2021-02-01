@@ -1,54 +1,16 @@
 # rfe-ansible-edge-mgmt
 
-Ansible automation to provision an RHEL for Edge Environments.
+Approaches for using Ansible to manage the lifecycle of RHEL for Edge (RFE) environments.
 
-![Architecture](docs/images/architecture_overview.png)
+## Overview
 
-## Prerequisites
-### Download dependencies
+This repository contains several approaches demonstrating how Ansible automation can be used to manage a RHEL for Edge environment. Each scenarios is separated onto its own branch and reference a common branch containing the Ansible automation. 
 
-Execute the following commands to download the required dependencies
+The following scenarios are available:
 
-```
-$ ansible-galaxy role install -r collections/requirements.yaml
-```
+1. `ansible-engine` - Ansible automation executed directly on the RFE node
+2. `ansible-runner` - Ansible automation executed within a container running on the RFE node
+3. `ansible-tower` - Ansible automation driven using Ansible Tower. Provisioning Callbacks are used to trigger the automation when the RFE node starts.
 
-### Populate Inventory
+More information can be found in the respective branches.
 
-Add the Image Builder instance(s) into the [hosts](inventory/hosts) file.
-
-### Subscription Information
-
-The content within this repository leverages Red Hat RPM's. The automation to manage subscribing the machines and repositories makes use of the [rhsm](https://github.com/redhat-cop/infra-ansible/blob/master/roles/rhsm) role within the [infra-ansible](https://github.com/redhat-cop/infra-ansible) repository.
-
-It is recommended to add the necessary values to a separate file and inject it in as an extra parameter using `-e @<filename>` when executing the playbook. An example can be found below:
-
-```
----
-rhsm_username: "<password>"
-rhsm_password: "<username>"
-```
-
-You can choose to skip Ansible from managing subscription information by passing `-e rhsm_manage=false`. Be sure that the machine is subscribed to `ansible-2.9-for-rhel-8-x86_64-rpms` along with the default RHEL8 repositories.
-
-## Provision
-
-Execute the following command in order to provision the machine:
-
-```
-ansible-playbook -i inventory/ playbooks/image_builder.yaml
-```
-
-Once provisioning is complete, a HTTPD container that exposes the RFE image and kickstart file on port 8000.
-
-## Edge Nodes
-
-Since the above automation exposes the kickstart file and the edge image, boot the RHEL edge instance and add the kickstart arguments as follows:
-
-```
-inst.ks=http://<image_builder_node>:8000/kickstart.ks
-```
-
-## Edge Automation
-
-The key attribute of this architecture is that edge instances configure themselves by executing Ansible automation. This automation lives on a in the `ansible-edge` branch of this repository. A timer systemd service is configured to execute the automation on a regular basis.
