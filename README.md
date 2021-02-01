@@ -1,7 +1,11 @@
 # rfe-ansible-edge-mgmt
 
-Ansible automation to provision an RHEL for Edge Environments using Ansible Tower Provisioning Callbacks
+Ansible automation managed through Ansible Tower to provision a RHEL for Edge Environments
+## Solution Overview
 
+This approach focuses on Ansible Tower to centrally manage the automation for edge resources. As new edge nodes are created, a [Provisioning Callback](https://docs.ansible.com/ansible-tower/latest/html/userguide/job_templates.html#provisioning-callbacks) triggers automation to be applied to edge node.
+
+![Architecture](docs/images/architecture_overview.png)
 ## Prerequisites
 ### Download dependencies
 
@@ -27,7 +31,7 @@ rhsm_username: "<password>"
 rhsm_password: "<username>"
 ```
 
-You can choose to skip Ansible from managing subscription information by passing `-e rhsm_manage=false`. Be sure that the machine is subscribed to `ansible-2.9-for-rhel-8-x86_64-rpms` along with the default RHEL8 repositories.
+**Note:** If your machine is already subscribed, you can skip registration by passing `-e rhsm_manage=false`.
 
 ## Ansible Tower
 
@@ -70,7 +74,7 @@ After selecting "Enable provisioning callback", generate a new Host config key. 
 Execute the following command in order to provision the machine being sure to substitute the callback url and host config key in the extra variable parameters as shown below:
 
 ```
-ansible-playbook -i inventory/ playbooks/image_builder.yaml -e ansible_tower.callback_url=<callback_url> -e ansible_tower.host_config_key=<host_config_key>
+ansible-playbook -i inventory/ playbooks/image_builder.yaml -e '{"ansible_tower":{ "callback_url": "<callback_url>", "host_config_key":"<host_config_key>" }}'
 ```
 
 Once provisioning is complete, a HTTPD container that exposes the RFE image and kickstart file on port 8000.
