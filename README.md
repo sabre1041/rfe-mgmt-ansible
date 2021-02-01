@@ -1,4 +1,4 @@
-# rfe-ansible-edge-mgmt
+# rfe-mgmt-ansible
 
 Ansible automation managed through Ansible Tower to provision a RHEL for Edge Environments
 ## Solution Overview
