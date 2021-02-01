@@ -1,6 +1,9 @@
 # rfe-ansible-edge-mgmt
 
-Ansible automation to provision an RHEL for Edge Environments.
+Ansible automation to provision an RHEL for Edge Environments
+## Solution Overview
+
+This approach focuses on the Ansible automation being driven through a containerized environment with Ansible running on the edge node. As new edge nodes are created, a container using the [ansible-runner](https://github.com/ansible/ansible-runner) image executes the Ansible automation to provision the edge node
 
 ![Architecture](docs/images/architecture_overview.png)
 
