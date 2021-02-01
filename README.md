@@ -5,7 +5,7 @@ Ansible automation managed through Ansible Tower to provision a RHEL for Edge En
 
 This approach focuses on Ansible Tower to centrally manage the automation for edge resources. As new edge nodes are created, a [Provisioning Callback](https://docs.ansible.com/ansible-tower/latest/html/userguide/job_templates.html#provisioning-callbacks) triggers automation to be applied to edge node.
 
-![Architecture](docs/images/architecture_overview.png)
+![Architecture](docs/images/ansible-tower-architecture.png)
 ## Prerequisites
 ### Download dependencies
 
