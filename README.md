@@ -1,4 +1,4 @@
-# rfe-ansible-edge-mgmt-repo
+# rfe-mgmt-ansible
 
 Automation of RHEL for Edge node configuration using Ansible
 
