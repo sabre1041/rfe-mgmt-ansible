@@ -1,4 +1,4 @@
-# rfe-ansible-edge-mgmt
+# rfe-mgmt-ansible
 
 Approaches for using Ansible to manage the lifecycle of RHEL for Edge (RFE) environments.
 
