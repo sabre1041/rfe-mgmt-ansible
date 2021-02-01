@@ -22,7 +22,7 @@ text
 network --bootproto=dhcp
 
 # create default user 'core' with sudo privileges using password 'edge'
-user --name=core --groups=wheel --password=edge
+user --name={{ rfe_user }} --groups=wheel --password={{ rfe_password }}
 
 # set up the OSTree-based install with disabled GPG key verification, the base
 # URL to pull the installation content, 'rhel' as the management root in the
@@ -36,28 +36,11 @@ ostreesetup --nogpg --url=http://{{ ansible_default_ipv4.address }}:{{ httpd_hos
 #stage updates as they become available. This is highly recommended
 echo AutomaticUpdatePolicy=stage >> /etc/rpm-ostreed.conf
 
-
-# Set up automation script
-
-mkdir /var/rfe
-
-cat > /var/rfe/setup.sh << 'EOF'
-#!/bin/bash
-
-GIT_REPO="{{ rfe_git.url }}"
-GIT_VERSION="{{ rfe_git.version }}"
-REPO_DIR="/var/rfe/repo"
-PLAYBOOK_FILE="{{ rfe_git.playbook_file }}"
-
-ansible -c local localhost -m git -a "repo=${GIT_REPO} dest=${REPO_DIR} version=${GIT_VERSION}" > /dev/null
-
-if [ -f "${REPO_DIR}/${PLAYBOOK_FILE}" ]; then
-  ansible-playbook -c local "${REPO_DIR}/${PLAYBOOK_FILE}"
-fi
-
+cat << EOF > /etc/systemd/system/rfe-automation.json
+{
+  "host_config_key": "{{ ansible_tower.host_config_key }}"
+}
 EOF
-
-chmod +x /var/rfe/setup.sh
 
 cat > /etc/systemd/system/rfe-automation.service << 'EOF'
 [Unit]
@@ -69,7 +52,7 @@ After=nss-lookup.target
  
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c '/var/rfe/setup.sh'
+ExecStart=/usr/bin/curl -kfH 'Content-Type: application/json' -XPOST -d @/etc/systemd/system/rfe-automation.json {{ ansible_tower.callback_url }}
 
 [Install]
 WantedBy=multi-user.target
