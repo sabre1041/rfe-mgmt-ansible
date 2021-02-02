@@ -13,6 +13,7 @@ Execute the following commands to download the required dependencies
 
 ```
 $ ansible-galaxy role install -r collections/requirements.yaml
+$ ansible-galaxy role collection -r collections/requirements.yaml
 ```
 
 ### Populate Inventory
@@ -35,7 +36,31 @@ rhsm_password: "<username>"
 
 ## Ansible Tower
 
-Ansible automation is performed via Ansible Tower and Provisioning Callbacks. Perform the following configurations in an existing Ansible Tower environment:
+Ansible automation is performed via Ansible Tower and Provisioning Callbacks. Automation is available to configure an existing Ansible Tower environment.
+
+Similar to the subscription details as described in the prior section, it is recommended that you place the following parameters in a separate file called `tower_creds.yaml` which will be added as extra variables when invoking the `ansible-playbook` command:
+
+```
+---
+tower_hostname: https://<tower_host>
+tower_validate_certs: false
+tower_username: <username>
+tower_password: <password>
+```
+
+A playbook at [playbooks/config_tower.yaml](playbooks/config_tower.yaml) is available to perform the automation. This playbook makes use of resources defined in the group variables file [inventory/group_vars/tower.yaml](inventory/group_vars/tower.yaml). A few important points to note regarding the defined variables:
+
+* A default static value for the `host_config_key` representing the key used by the Provisioning Callback. It is recommended that an alternate value be specified
+* The `tower_hosts` contains the hosts that should be added to the inventory group. By default, no hosts are defined. Add any hosts that should be eligible to make use of the Provisioning Callback.
+
+Execute the playbook by using the following command:
+
+```
+$ ansible-playbook -i inventory/ -c local playbooks/config_tower.yaml -e @tower_creds.yml
+```
+
+
+Ansible Tower can be manually configured instead of using the automation by performing the following steps:
 
 ### Credentials
 

@@ -1,0 +1,23 @@
+---
+- hosts: tower
+  collections:
+    - redhat_cop.tower_configuration
+  tasks:
+    - name: Manage Project
+      include_role:
+        name: projects
+    - name: Manage Machine Credential
+      include_role:
+        name: credentials
+    - name: Manage Inventory
+      include_role:
+        name: inventories
+    - name: Manage Hosts
+      include_role:
+        name: hosts
+    - name: Manage Groups
+      include_role:
+        name: groups
+    - name: Manage Templates
+      include_role:
+        name: job_templates

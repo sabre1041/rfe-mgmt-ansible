@@ -1,0 +1,43 @@
+---
+tower_projects:
+  - name: rfe-mgmt-ansible
+    organization: Default
+    description: "RFE Ansible Management"
+    scm_url: "https://github.com/sabre1041/rfe-mgmt-ansible"
+    scm_branch: "ansible-edge"
+    scm_type: git
+    scm_update_on_launch: true
+
+tower_credentials:
+  - kind: ssh
+    name: rfe
+    user: "{{ tower_username }}"
+    inputs:
+      username: "{{ rfe_user }}"
+      password: "{{ rfe_password }}"
+      become_password: "{{ rfe_password }}"
+
+tower_inventories:
+  - name: rfe
+    description: RHEL for Edge
+    organization: Default
+
+tower_hosts:
+#  - name: myrfehost
+#    inventory: rfe
+
+tower_groups:
+  - name: localhost
+    inventory: rfe
+    hosts: "{{ tower_hosts | map(attribute='name') | list }}"
+
+tower_templates:
+  - name: rfe-test
+    description: RHEL for Edge Automation
+    job_type: run
+    inventory: rfe
+    credentials: rfe
+    project: rfe-mgmt-ansible
+    playbook: playbooks/rfe.yaml
+    become_enabled: true
+    host_config_key: "b53f985a-632f-4fd0-8665-c139963b7a19"
