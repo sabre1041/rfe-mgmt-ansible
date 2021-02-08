@@ -3,6 +3,7 @@
 [![GitHub Super-Linter](https://github.com/sabre1041/rfe-mgmt-ansible/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
 
 Ansible automation to provision an RHEL for Edge Environments
+
 ## Solution Overview
 
 This approach focuses on the Ansible automation being driven through a containerized environment with Ansible running on the edge node. As new edge nodes are created, a container using the [ansible-runner](https://github.com/ansible/ansible-runner) image executes the Ansible automation to provision the edge node
@@ -10,12 +11,13 @@ This approach focuses on the Ansible automation being driven through a container
 ![Architecture](docs/images/architecture_overview.png)
 
 ## Prerequisites
+
 ### Download dependencies
 
 Execute the following commands to download the required dependencies
 
-```
-$ ansible-galaxy role install -r collections/requirements.yaml
+```shell
+ansible-galaxy role install -r collections/requirements.yaml
 ```
 
 ### Populate Inventory
@@ -28,7 +30,7 @@ The content within this repository leverages Red Hat RPM's. The automation to ma
 
 It is recommended to add the necessary values to a separate file and inject it in as an extra parameter using `-e @<filename>` when executing the playbook. An example can be found below:
 
-```
+```yaml
 ---
 rhsm_username: "<password>"
 rhsm_password: "<username>"
@@ -40,7 +42,7 @@ rhsm_password: "<username>"
 
 Execute the following command in order to provision the machine:
 
-```
+```shell
 ansible-playbook -i inventory/ playbooks/image_builder.yaml
 ```
 
@@ -50,7 +52,7 @@ Once provisioning is complete, a HTTPD container that exposes the RFE image and 
 
 Since the above automation exposes the kickstart file and the edge image, boot the RHEL edge instance and add the kickstart arguments as follows:
 
-```
+```shell
 inst.ks=http://<image_builder_node>:8000/kickstart.ks
 ```
 
