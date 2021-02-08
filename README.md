@@ -1,5 +1,7 @@
 # rfe-mgmt-ansible
 
+[![GitHub Super-Linter](https://github.com/sabre1041/rfe-mgmt-ansible/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
+
 Ansible automation to provision an RHEL for Edge Environments
 ## Solution Overview
 
