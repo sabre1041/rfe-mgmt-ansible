@@ -1,17 +1,30 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+Ansible role to build images for RHEL for EDGE
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Requires podman installed (default on RFE), and internet connectivity to pull from quay.io and docker.io or configure a interally accessible repository to pull images from via the `ansible_runner` variable.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+| Variable                       | Default                                   |
+|--------------------------------|-------------------------------------------|
+| rhsm_manage                    | true                                      |
+| blueprints_tmp_directory       | /tmp/blueprints                           |
+| container_image_directory_path | /tmp/container_build                      |
+| yum_packages                   | see roles/image_builder/defaults/main.yml |
+| systemd_services               | see roles/image_builder/defaults/main.yml |
+| rfe_user                       | core                                      |
+| rfe_password                   | edge                                      |
+| rfe_git                        | see roles/image_builder/defaults/main.yml |
+| rfe_automation_timer_sync      | 60min                                     |
+| httpd_container_port           | 80                                        |
+| httpd_host_port                | 8000                                      |
+| ansible_runner                 | see roles/image_builder/defaults/main.yml |
 
 Dependencies
 ------------
@@ -23,9 +36,15 @@ Example Playbook
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+```yaml
+---
+- hosts: image_builder
+  become: yes
+  tasks:
+    - name: Image Builder Role
+      import_role:
+        name: image_builder
+```
 
 License
 -------
@@ -35,4 +54,4 @@ BSD
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Please contact via issues on github.
