@@ -1,19 +1,24 @@
 # rfe-mgmt-ansible
 
+[![GitHub Super-Linter](https://github.com/sabre1041/rfe-mgmt-ansible/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
+
 Ansible automation managed through Ansible Tower to provision a RHEL for Edge Environments
+
 ## Solution Overview
 
 This approach focuses on Ansible Tower to centrally manage the automation for edge resources. As new edge nodes are created, a [Provisioning Callback](https://docs.ansible.com/ansible-tower/latest/html/userguide/job_templates.html#provisioning-callbacks) triggers automation to be applied to edge node.
 
 ![Architecture](docs/images/ansible-tower-architecture.png)
+
 ## Prerequisites
+
 ### Download dependencies
 
 Execute the following commands to download the required dependencies
 
-```
-$ ansible-galaxy role install -r collections/requirements.yaml
-$ ansible-galaxy role collection -r collections/requirements.yaml
+```shell
+ansible-galaxy role install -r collections/requirements.yaml
+ansible-galaxy role collection -r collections/requirements.yaml
 ```
 
 ### Populate Inventory
@@ -26,7 +31,7 @@ The content within this repository leverages Red Hat RPM's. The automation to ma
 
 It is recommended to add the necessary values to a separate file and inject it in as an extra parameter using `-e @<filename>` when executing the playbook. An example can be found below:
 
-```
+```yaml
 ---
 rhsm_username: "<password>"
 rhsm_password: "<username>"
@@ -40,7 +45,7 @@ Ansible automation is performed via Ansible Tower and Provisioning Callbacks. Au
 
 Similar to the subscription details as described in the prior section, it is recommended that you place the following parameters in a separate file called `tower_creds.yaml` which will be added as extra variables when invoking the `ansible-playbook` command:
 
-```
+```yaml
 ---
 tower_hostname: https://<tower_host>
 tower_validate_certs: false
@@ -55,10 +60,9 @@ A playbook at [playbooks/config_tower.yaml](playbooks/config_tower.yaml) is avai
 
 Execute the playbook by using the following command:
 
+```shell
+ansible-playbook -i inventory/ -c local playbooks/config_tower.yaml -e @tower_creds.yml
 ```
-$ ansible-playbook -i inventory/ -c local playbooks/config_tower.yaml -e @tower_creds.yml
-```
-
 
 Ansible Tower can be manually configured instead of using the automation by performing the following steps:
 
@@ -67,11 +71,13 @@ Ansible Tower can be manually configured instead of using the automation by perf
 Add a new [Machine Credential](https://docs.ansible.com/ansible-tower/latest/html/userguide/credentials.html) called **rfe** that will be used to connect to edge devices.
 
 Enter the _username_ and _password_ of the edge device. By default, it is configured as _core_ and _edge_respectively. Be sure to also enter the password in the _Privilege Escalation Password_ field.
+
 ### Project
 
 Add a new [Project](https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html) called **rfe-ansible-mgmt** that references the branch containing the automation.
 
 Enter the SCM URL using the HTTPS clone address and the branch `ansible-edge`
+
 ### Inventory
 
 Create a new [Inventory](https://docs.ansible.com/ansible-tower/latest/html/userguide/inventories.html) called **rfe** containing the following:
@@ -98,7 +104,7 @@ After selecting "Enable provisioning callback", generate a new Host config key. 
 
 Execute the following command in order to provision the machine being sure to substitute the callback url and host config key in the extra variable parameters as shown below:
 
-```
+```shell
 ansible-playbook -i inventory/ playbooks/image_builder.yaml -e '{"ansible_tower":{ "callback_url": "<callback_url>", "host_config_key":"<host_config_key>" }}'
 ```
 
@@ -108,7 +114,7 @@ Once provisioning is complete, a HTTPD container that exposes the RFE image and 
 
 Since the above automation exposes the kickstart file and the edge image, boot the RHEL edge instance and add the kickstart arguments as follows:
 
-```
+```shell
 inst.ks=http://<image_builder_node>:8000/kickstart.ks
 ```
 
